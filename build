@@ -1,3 +1,29 @@
 #!/bin/bash
 
-exec ant war
+scriptName=$(basename $0)
+
+function build() {
+  ant war
+}
+
+function run() {
+  mvn jetty:deploy-war
+}
+
+function build-and-run() {
+  build && run
+}
+
+function clean() {
+  [[ -f Hello.war ]] && rm Hello.war
+  mvn clean
+}
+
+if   [[ $1 == "build" ]]; then build
+elif [[ $1 == "run" ]]; then run
+elif [[ $1 == "build-and-run" ]]; then build-and-run
+elif [[ $1 == "clean" ]]; then clean
+else
+  echo "usage: $scriptName build | run | build-and-run | clean" >&2
+  exit 2
+fi
