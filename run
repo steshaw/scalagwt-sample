@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec mvn jetty:deploy-war
