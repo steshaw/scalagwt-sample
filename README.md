@@ -1,10 +1,10 @@
-# About
+## About
 
 Scala+GWT hello world application.
 
 Note: This project uses custom versions of GWT and Scala included in lib directory.
 
-# Building
+## Building
 
 1. Build with:
 >    $ ant war
