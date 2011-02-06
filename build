@@ -2,28 +2,56 @@
 
 scriptName=$(basename $0)
 
-function build() {
-  ant war
+function Maven() {
+  mvn --quiet "$@"
 }
 
-function run() {
-  mvn jetty:deploy-war
+function Ant() {
+  ant "$@"
 }
 
-function build-and-run() {
-  build && run
+function All() {
+  Build && Run
 }
 
-function clean() {
-  [[ -f Hello.war ]] && rm Hello.war
-  mvn clean
+function Build() {
+  Ant war
 }
 
-if   [[ $1 == "build" ]]; then build
-elif [[ $1 == "run" ]]; then run
-elif [[ $1 == "build-and-run" ]]; then build-and-run
-elif [[ $1 == "clean" ]]; then clean
-else
-  echo "usage: $scriptName build | run | build-and-run | clean" >&2
+function Run() {
+  Maven jetty:deploy-war
+}
+
+function Clean() {
+  Ant clean
+  Maven clean
+}
+
+function Usage() {
+  echo "Usage: $scriptName [all | build | run | clean] …" >&2
   exit 2
+}
+
+function ProcessArg() {
+  case $1 in
+    all) All;;
+    build) Build;;
+    run)   Run;;
+    clean) Clean;;
+  esac
+}
+
+while getopts ":h" flag; do
+  case $flag in
+    h) Usage;;
+    \?) [[ $OPTARG != '?' ]] && echo "$scriptName: invalid option -- $OPTARG" >&2; Usage;;
+  esac
+done
+
+if [[ $# -eq 0 ]]; then
+  ProcessArg all
+else
+  for arg in "$@"; do
+    ProcessArg $arg || exit $?
+  done
 fi
